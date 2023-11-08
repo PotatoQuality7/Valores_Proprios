@@ -275,6 +275,9 @@ switch ($_SESSION['passo']) {
 			"Primeiro verificamos para a primeira raiz",
 			"Depois verificamos para a segunda raiz",
 			"Multiplicamos as matrizes",
+			"Formamos uma matriz, e em seguida, aplicamos o Metodo Gauss, para obter as incognitas",
+			"No fim, temos:",
+			"E as incognitas:",
 		];
 		$passo_aux = ["Como a matriz e de terceira ordem, voltamos a escrever as primeiras duas colunas dos elementos da matriz"];
 		$pass = 0;
@@ -492,8 +495,9 @@ switch ($_SESSION['passo']) {
 //END SWITCH
 }
 $raiz = [];
+$raizes = [];
 $count = 0;
-for ($step = 10; $step <= 14; $step++) { ?>
+for ($step = 10; $step <= 17; $step++) { ?>
 	<p><?php echo $passo[$pass].": ".$pass ?></p> <?php
 	
 	switch ($step) {
@@ -508,8 +512,7 @@ for ($step = 10; $step <= 14; $step++) { ?>
 				 echo "L"?><sub>2</sub><?php echo " = ".$raiz[1];
 				 break;
 		case 12: ;
-		case 13: ;
-		case 14: $letras = ["x","y","z"];
+		case 13: $letras = ["x","y","z"];
 				 for ($i = 0; $i < $num_T; $i++) {
 					echo "( ";
 					for ($j = 0; $j < $num_T; $j++) {
@@ -528,12 +531,119 @@ for ($step = 10; $step <= 14; $step++) { ?>
 					 else {
 					   ?>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<?php
 					 }
+					$raizes[$i] = $raiz[$count];
 					echo "( ".$letras[$i]." )"; ?>
-				 	<br>
+				 	<br><?php
 				 }
-				 
+				 if ($count == 0) {
+					 $step = 13;
+					 $pass = 13;
+				 }
 				 break;
-		case 14:
+		case 14: ;
+		case 15: for ($i = 0; $i < $num_T; $i++) {
+					echo "( ";
+					for ($j = 0; $j < $num_T; $j++) {
+						 $algo = "a".$i.$j;
+						 echo $_POST[$algo];
+	 					 if ($step == 14)
+						 	 echo $letras[$j];
+						 if ($j != $num_T-1)
+						 	echo " ";
+					}
+					if ($step == 14) {
+						echo " )"; 
+						if (($i == round(($num_T+1)/2,0,PHP_ROUND_HALF_DOWN)-1))
+							echo " = ";
+						 else {
+						   ?>&nbsp&nbsp&nbsp&nbsp<?php
+						 }
+						echo "( ";
+					 }
+					 else
+					   echo " | ";
+					echo $raiz[$count];
+					if ($step == 14)
+						echo $letras[$i];
+					echo " )"; ?>
+				 	<br><?php
+				 }
+				 break;
+		case 16:
+$matriz = [];
+for ($i = 0; $i < $num_T; $i++) {
+	for ($j = 0; $j < $num_T; $j++) {
+		$algo = "a".$i.$j;
+		$matriz[$i][$j] = $_POST[$algo];
+	}
+}
+		for ($i = 0; $i < $num_T; $i++) {
+						$j = $i;
+						if ($matriz[$i][$j] != 0)
+							break;
+						 else {
+							for ($k = $i; $k < $num_T; $k++) {
+								if ($matriz[$k][$j] != 0) {
+									 for ($l = 0; $l < $num_T; $l++) {
+										$temp = $matriz[$i][$l];
+										$matriz[$i][$l] = $matriz[$k][$l];
+										$matriz[$k][$l] = $temp;
+									 }
+								    break;
+								}
+							}
+				 		}
+				 }
+for ($i = 0; $i < $num_T; $i++) {
+	 $j = $i;
+	for ($k = 0; $k < $num_T; $k++) {
+		 if ($i == $k || $matriz[$k][$j] == 0)
+		 	continue;
+		 $fator = $matriz[$k][$j]/$matriz[$i][$j];
+		 for ($l = 0; $l < $num_T; $l++) {
+			$matriz[$k][$l] -= $fator*$matriz[$i][$l];
+		 }
+		 $l--;
+		 $raizes[$k] -= $fator*$matriz[$i][$l];
+	}	 
+}
+
+		for ($i = 0; $i < $num_T; $i++) {
+					echo "( ";
+					for ($j = 0; $j < $num_T; $j++) {
+						 echo $matriz[$i][$j];
+	 					 if ($step == 14)
+						 	 echo $letras[$j];
+						 if ($j != $num_T-1)
+						 	echo " ";
+					}
+					if ($step == 14) {
+						echo " )"; 
+						if (($i == round(($num_T+1)/2,0,PHP_ROUND_HALF_DOWN)-1))
+							echo " = ";
+						 else {
+						   ?>&nbsp&nbsp&nbsp&nbsp<?php
+						 }
+						echo "( ";
+					 }
+					 else
+					   echo " | ";
+					echo $raizes[$i];
+					if ($step == 14)
+						echo $letras[$i];
+					echo " )"; ?>
+				 	<br><?php
+				 }
+
+			 	 break;
+		case 17:
+
+		 if ($count == 0) {
+				 	 $count++;
+					 $step = 12;
+					 $pass = 12;
+			 	 }
+				 break;
 	}
 	$pass++;
     } ?>
