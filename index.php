@@ -2,7 +2,7 @@
 
 session_start();
 
-//$_SESSION['passo'] = 3;
+$_SESSION['passo'] = 3;
 
 if (isset($_POST['reiniciar']))
 	$_SESSION['passo'] = null;
@@ -278,7 +278,7 @@ switch ($_SESSION['passo']) {
 			"Formamos uma matriz, e em seguida, aplicamos o Metodo Gauss, para obter as incognitas",
 			"No fim, temos:",
 			"E as incognitas:",
-			"Por fim, temos o autovetor",
+			"Por fim, a nossa solucao",
 		];
 		$passo_aux = ["Como a matriz e de terceira ordem, voltamos a escrever as primeiras duas colunas dos elementos da matriz"];
 		$pass = 0;
@@ -647,14 +647,14 @@ for ($step = 10; $step <= 18; $step++) { ?>
 				 }
 				 break;
 		 case 18: echo "v"?><sub><?php echo ($count+1) ?></sub>
-				 <?php echo "= (";
+				 <?php echo "= w(";
 				 for ($i = 0; $i < $num_T; $i++) {
 				 	 echo $letras[$i];
 				 	 echo $i == $num_T-1? ")" : ",";
 				 } ?>
 				 <br><?php
 				echo "v"?><sub><?php echo ($count+1) ?></sub>
-				 <?php echo "= (";
+				 <?php echo "= w(";
 				 for ($i = 0; $i < $num_T; $i++) {
 				 	 echo $valores[$i];
 				 	 echo $i == $num_T-1? ")" : ",";
@@ -663,7 +663,15 @@ for ($step = 10; $step <= 18; $step++) { ?>
 				 	 $count++;
 					 $step = 12;
 					 $pass = 12;
-			 	 }
+			 	 } ?>
+			 	 <br><br> <?php
+			 	 echo "Onde o w é o nosso autovalor, e o (";
+			 	 for ($i = 0; $i < $num_T; $i++) {
+				 	 echo $letras[$i];
+				 	 echo $i == $num_T-1? ")" : ",";
+				 } ?>
+				 <br><?php
+				 echo "é o nosso autovetor.";
 				 break;
 	}
 	$pass++;
@@ -683,7 +691,6 @@ if ($_SESSION['passo'] >= 2) { ?>
 	let msg = <?php echo json_encode($msg) ?>;
 	let numbros = <?php echo json_encode($numbros) ?>;
 	console.log(numbros);
-	alert("herr");
 	alert(msg);
 	if (msg != null) {
 		alert(msg);
