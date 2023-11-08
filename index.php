@@ -2,7 +2,7 @@
 
 session_start();
 
-$_SESSION['passo'] = 3;
+//$_SESSION['passo'] = 3;
 
 if (isset($_POST['reiniciar']))
 	$_SESSION['passo'] = null;
@@ -284,7 +284,7 @@ switch ($_SESSION['passo']) {
 		for ($step = 0; $step <= 9; $step++) {
 			$pos = 0; ?>
 			<br>
-			<p><?php echo $passo[$pass].": ".$pass ?></p>
+			<p><?php echo $passo[$pass] ?></p>
 			<?php	
 		 	for ($count = 0; $count <= 1; $count++) { ?> 
 				<table style="display: inline-block">
@@ -498,7 +498,7 @@ $raiz = [];
 $raizes = [];
 $count = 0;
 for ($step = 10; $step <= 17; $step++) { ?>
-	<p><?php echo $passo[$pass].": ".$pass ?></p> <?php
+	<p><?php echo $passo[$pass] ?></p> <?php
 	
 	switch ($step) {
 		case 10: ?>L<sub>1</sub><?php echo "= (-".$coeff[1]."+sqrt( (".$coeff[1].")"?><sup>2</sup><?php echo "-4•".$coeff[0]."•".$coeff[2]." ) )/2•".$coeff[0];
@@ -599,8 +599,10 @@ for ($i = 0; $i < $num_T; $i++) {
 	for ($k = 0; $k < $num_T; $k++) {
 		 if ($i == $k || $matriz[$k][$j] == 0)
 		 	continue;
-		 $fator = $matriz[$k][$j]/$matriz[$i][$j];
 		 for ($l = 0; $l < $num_T; $l++) {
+		 	if ($matriz[$i][$l] == 0)
+		 		continue;
+			$fator = $matriz[$k][$l]/$matriz[$i][$l];
 			$matriz[$k][$l] -= $fator*$matriz[$i][$l];
 		 }
 		 $l--;
@@ -637,7 +639,13 @@ for ($i = 0; $i < $num_T; $i++) {
 
 			 	 break;
 		case 17:
-
+		$valores = [];
+for ($i = 0; $i < $num_T; $i++) {
+$j = $i;
+$valores[$i] = $raizes[$i]/$matriz[$i][$j];
+echo $letras[$i]." = ".$valores[$i];
+?><br><?php
+}
 		 if ($count == 0) {
 				 	 $count++;
 					 $step = 12;
