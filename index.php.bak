@@ -1,0 +1,233 @@
+<?php
+
+session_start();
+
+if (!isset($_SESSION['passo']))
+	$_SESSION['passo'] = 1;
+
+if (isset($_POST['reiniciar'])) {
+	$_SESSION['num_T'] = null;
+}
+
+switch ($_SESSION['passo']) {
+	case 1: $_SESSION['metodo'] = $_POST['metodo'];
+			break;
+	case 2: $_SESSION['num_T'] = $_POST['num_T'];
+			$_SESSION['letra'] = "a";
+			$_POST['y'] = 0;
+			$_POST['x'] = 0;
+			alert($_SESSION['num_T']);
+			break;
+	case 3: if ($_POST['valor'] == null)
+				$msg = "Insira um valor";
+			 else {	
+				switch ($_SESSION['letra']) {
+					case "a": $algo = $_SESSION['letra'].$_POST['y'].$_POST['x']; break;
+				    default: $algo = $_SESSION['letra'].$_POST['x']; break;
+				}
+				$_POST[$algo] = $_POST['valor'];
+				$_POST['x']++;
+				if ($_POST['x'] == $_SESSION['num_T']) {
+					$_POST['y']++;
+					$_POST['x'] = 0;
+					if ($_POST['y'] == $_SESSION['num_T']) {
+						$_SESSION['letra'] = "b";			
+						$_POST['y'] = 0;
+					}
+
+				}
+			 }
+			break;
+}
+
+if (isset($_POST['incrementar'])) {
+	$_SESSION['passo']++;
+}
+
+?>
+
+<html>
+<head>
+	<link href="./styles.css" rel="stylesheet">
+</head>
+
+<body>
+	<h1>Valores Proprios e Vetores Proprios</h1>
+	<?php
+		switch ($_SESSION['passo']) {
+			case 1: ?> //Selecionar opcao
+				<form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST">
+					<label>Selecione uma das opcoes</label>
+					<button type="text" name="metodo" value="demonstracao">Demonstração</button>
+					<button type="text" name="metodo" value="resolucao">Resolução</button>
+					<input class="ghost" type="number" name="incrementar" value="1">
+				</form>
+				<?php break;
+			case 2: ?> //Escolher dimensao da matriz
+				<form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST">
+					<label>Selecione o numero de colunas e linhas</label>
+					<button type="number" name="num_T" value="2">2</button>
+					<button type="number" name="num_T" value="3">3</button>
+				</form>
+				break;
+	<?php }	
+		else { 
+			$letras = ["x", "y", "z"];
+			$algo = "";
+?>
+			<form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST">
+				<table>
+					<legend>Matriz</legend>
+					<?php
+						$num_T = $_SESSION['num_T'];
+						for ($i = 0; $i <= $num_T; $i++) { ?>
+							<tr>
+								<?php 
+								for ($j = 1; $j <= $num_T; $j++) { ?>
+									<td>
+										<?php 
+											if ($i != 0) {
+										    	if ($j == 1) echo "(";
+												$algo = "a".($i-1).($j-1);
+												if (!isset($_POST[$algo])) 
+													  echo "a".$i.$j;
+												   else
+													 echo $_POST[$algo];
+												if ($j == $num_T) echo ")";
+											}
+											else
+												echo $letras[$j-1];
+										 ?>
+									</td>
+									<?php if (isset($_POST[$algo])) { ?>
+										<input class="ghost" name="<?php echo "a".($i-1).($j-1) ?>" value="<?php echo $_POST[$algo] ?>" >
+									<?php } ?>
+								<?php }
+								 ?>
+							</tr>
+					<?php } ?>
+				</table>
+				<br>
+				<table>
+					<legend>Vetor</legend>
+					<?php
+						$num_T = $_SESSION['num_T'];
+						for ($i = 0; $i <= 1; $i++) { ?><tr>
+						<?php
+							for ($j = 1; $j <= $num_T; $j++) { ?>
+								<td>
+									<?php 									
+										if ($i == 0) {
+											echo $letras[$j-1];
+											continue;
+										}
+										$algo = "b".($j-1);
+										if ($j == 1) echo "(";
+										if (!isset($_POST[$algo])) 
+											  echo "b".$j;
+										   else
+											 echo $_POST[$algo];									
+										if ($j == $num_T) echo ")";
+									?>
+								</td>
+								<?php if (isset($_POST[$algo])) { ?>
+									<input class="ghost" name="<?php echo "b".($j-1) ?>" value="<?php echo $_POST[$algo] ?>" >
+								<?php }
+							}	
+						}
+						?>
+						</tr>
+				</table>
+				<br><br>
+				<?php
+					$algo = "b".($_SESSION['num_T']-1);
+					if (isset($_SESSION['num_T']) AND !isset($_POST['calcular'])) { 
+						if (!isset($_POST[$algo])) { ?>
+							<?php if ($_SESSION['letra'] == "a") { ?>
+								 	<label>Insira o valor de: <?php echo "a".($_POST['y']+1).($_POST['x']+1) ?></label>
+							<?php } else { ?>
+								 	<label>Insira o valor de: <?php echo "b".($_POST['x']+1) ?></label>
+							<?php } ?>
+							<input type="number" name="valor">
+							<input class="ghost" type="number" name="y" value="<?php echo $_POST['y'] ?>">
+							<input class="ghost" type="number" name="x" value="<?php echo $_POST['x'] ?>">
+							<button name="inserir">Inserir</button>
+						<?php }
+						else { ?>
+							<button name="calcular">Calcular</button>
+						<?php } ?>
+						<br><br>
+				<?php } ?>
+			</form>
+		<?php } ?>
+
+		<?php if (isset($_POST['calcular'])) { ?>
+				<div id="resposta">
+					<h1>Resposta</h1>
+					<table>
+							<?php
+								$num_T = $_SESSION['num_T'];
+								$letras = ["x", "y"];
+								if ($num_T == 3) 
+									array_push($letras,"z");
+								$resp = $num_T == 3? "T(x,y,z) = " : "T(x,y) = ";
+								for ($i = 0; $i <= 3; $i++) { ?>
+									<tr>
+									<?php
+										for ($j = 0; $j < $num_T; $j++) { ?>
+											<td>
+												<?php 
+													$sum = 0;
+													if ($j == 0)
+														echo $resp." ( ";
+													for ($k = 0; $k < $num_T; $k++) {
+														$algo = "a".$j.$k;
+														if ($i != 3) {
+															echo $_POST[$algo].$letras[$k];
+															if ($k < $num_T-1)
+																echo "+";
+															$algoo = "b".$k;
+														}			
+														switch ($i) {
+															case 0:	if ($j == $num_T-1)				 
+																	$letras[$k] = "(".$_POST[$algoo].")";
+																	break;
+															case 1: $_POST[$algo] *= $_POST[$algoo];
+																	if ($j == $num_T-1)				 
+																		$letras[$k] = "";
+																		break;
+															case 3: $sum += $_POST[$algo];
+																	if ($k == $num_T-1)
+																		echo $sum;
+																	break;
+														}
+													} 
+													if ($j < $num_T-1)
+														echo ", ";
+													if ($j == $num_T-1)
+														echo " )";
+												?>
+											</td>
+										<?php }	?>
+									</tr>
+								<?php } ?>
+						</table>	
+				</div>
+		<?php } ?>
+
+		<?php if (isset($_SESSION['num_T'])) { ?>
+		<form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST">
+				<button name="reiniciar">Reiniciar</button>
+		</form>
+		<?php } ?>
+
+	<script>
+		let msg = <?php echo json_encode($msg) ?>;
+		alert(msg);
+		if (msg != null) {
+			alert(msg);
+		}
+	</script>
+
+</body>
+</html>

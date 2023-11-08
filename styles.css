@@ -1,0 +1,11 @@
+label {
+	display: block;
+}
+
+.ghost {
+	display: none;
+}
+
+table {
+	text-align: justify;
+}
