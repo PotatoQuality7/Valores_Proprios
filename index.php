@@ -2,7 +2,7 @@
 
 session_start();
 
-$_SESSION['passo'] = 3;
+//$_SESSION['passo'] = 3;
 
 if (isset($_POST['reiniciar']))
 	$_SESSION['passo'] = null;
@@ -278,14 +278,14 @@ switch ($_SESSION['passo']) {
 			"Formamos uma matriz, e em seguida, aplicamos o Metodo Gauss, para obter as incognitas",
 			"No fim, temos:",
 			"E as incognitas:",
-			"Por fim, a nossa solucao",
+			"Por fim, a nossa solucao:",
 		];
 		$passo_aux = ["Como a matriz e de terceira ordem, voltamos a escrever as primeiras duas colunas dos elementos da matriz"];
 		$pass = 0;
 		for ($step = 0; $step <= 9; $step++) {
 			$pos = 0; ?>
 			<br>
-			<p><?php echo $passo[$pass] ?></p>
+			<p><?php echo $passo[$pass].":".$pass ?></p>
 			<?php	
 		 	for ($count = 0; $count <= 1; $count++) { ?> 
 				<table style="display: inline-block">
@@ -498,6 +498,7 @@ switch ($_SESSION['passo']) {
 if ($_SESSION['passo'] >= 5) {
 $raiz = [];
 $raizes = [];
+$valores = [];
 $count = 0;
 for ($step = 10; $step <= 18; $step++) { ?>
 	<p><?php echo $passo[$pass] ?></p> <?php
@@ -638,15 +639,23 @@ for ($step = 10; $step <= 18; $step++) { ?>
 				 	<br><?php
 				 }
 			 	 break;
-		case 17: $valores = [];
-				 for ($i = 0; $i < $num_T; $i++) {
+		case 17: for ($i = 0; $i < $num_T; $i++) {
 					$j = $i;
-					$valores[$i] = $raizes[$i]/$matriz[$i][$j];
-					echo $letras[$i]." = ".$valores[$i];
+					if ($matriz[$i][$j] == 0)
+						continue;
+					$valores[$count][$i] = $raizes[$i]/$matriz[$i][$j];
+					echo $letras[$i]." = ".$valores[$count][$i];
 					?><br><?php
 				 }
+				 if ($count == 0) {
+				 	 $count++;
+					 $step = 12;
+					 $pass = 12;
+			 	 }				 
 				 break;
-		 case 18: echo "v"?><sub><?php echo ($count+1) ?></sub>
+		 case 18: 
+for ($count = 0; $count <= 1; $count++) {
+		 echo "v"?><sub><?php echo ($count+1) ?></sub>
 				 <?php echo "= w(";
 				 for ($i = 0; $i < $num_T; $i++) {
 				 	 echo $letras[$i];
@@ -656,15 +665,16 @@ for ($step = 10; $step <= 18; $step++) { ?>
 				echo "v"?><sub><?php echo ($count+1) ?></sub>
 				 <?php echo "= w(";
 				 for ($i = 0; $i < $num_T; $i++) {
-				 	 echo $valores[$i];
+				 	 echo $valores[$count][$i];
 				 	 echo $i == $num_T-1? ")" : ",";
-				 }		 
-				  if ($count == 0) {
-				 	 $count++;
-					 $step = 12;
-					 $pass = 12;
-			 	 } ?>
-			 	 <br><br> <?php
+				 } ?>
+				 <br><?php 
+				 if ($count == 0)
+				 	 echo "ou";?>
+				 <br><?php 
+}
+?>
+			 	 <br> <?php
 			 	 echo "Onde o w é o nosso autovalor, e o (";
 			 	 for ($i = 0; $i < $num_T; $i++) {
 				 	 echo $letras[$i];
