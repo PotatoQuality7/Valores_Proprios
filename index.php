@@ -278,6 +278,7 @@ switch ($_SESSION['passo']) {
 			"Formamos uma matriz, e em seguida, aplicamos o Metodo Gauss, para obter as incognitas",
 			"No fim, temos:",
 			"E as incognitas:",
+			"Por fim, temos o autovetor",
 		];
 		$passo_aux = ["Como a matriz e de terceira ordem, voltamos a escrever as primeiras duas colunas dos elementos da matriz"];
 		$pass = 0;
@@ -494,10 +495,11 @@ switch ($_SESSION['passo']) {
 		break;
 //END SWITCH
 }
+if ($_SESSION['passo'] >= 5) {
 $raiz = [];
 $raizes = [];
 $count = 0;
-for ($step = 10; $step <= 17; $step++) { ?>
+for ($step = 10; $step <= 18; $step++) { ?>
 	<p><?php echo $passo[$pass] ?></p> <?php
 	
 	switch ($step) {
@@ -569,15 +571,14 @@ for ($step = 10; $step <= 17; $step++) { ?>
 				 	<br><?php
 				 }
 				 break;
-		case 16:
-$matriz = [];
-for ($i = 0; $i < $num_T; $i++) {
-	for ($j = 0; $j < $num_T; $j++) {
-		$algo = "a".$i.$j;
-		$matriz[$i][$j] = $_POST[$algo];
-	}
-}
-		for ($i = 0; $i < $num_T; $i++) {
+		case 16: $matriz = [];
+					for ($i = 0; $i < $num_T; $i++) {
+						for ($j = 0; $j < $num_T; $j++) {
+							$algo = "a".$i.$j;
+							$matriz[$i][$j] = $_POST[$algo];
+						}
+					}
+				 for ($i = 0; $i < $num_T; $i++) {
 						$j = $i;
 						if ($matriz[$i][$j] != 0)
 							break;
@@ -594,23 +595,23 @@ for ($i = 0; $i < $num_T; $i++) {
 							}
 				 		}
 				 }
-for ($i = 0; $i < $num_T; $i++) {
-	 $j = $i;
-	for ($k = 0; $k < $num_T; $k++) {
-		 if ($i == $k || $matriz[$k][$j] == 0)
-		 	continue;
-		 for ($l = 0; $l < $num_T; $l++) {
-		 	if ($matriz[$i][$l] == 0)
-		 		continue;
-			$fator = $matriz[$k][$l]/$matriz[$i][$l];
-			$matriz[$k][$l] -= $fator*$matriz[$i][$l];
-		 }
-		 $l--;
-		 $raizes[$k] -= $fator*$matriz[$i][$l];
-	}	 
-}
+				for ($i = 0; $i < $num_T; $i++) {
+					 $j = $i;
+					for ($k = 0; $k < $num_T; $k++) {
+						 if ($i == $k || $matriz[$k][$j] == 0)
+						 	continue;
+						 for ($l = 0; $l < $num_T; $l++) {
+						 	if ($matriz[$i][$l] == 0)
+						 		continue;
+							$fator = $matriz[$k][$l]/$matriz[$i][$l];
+							$matriz[$k][$l] -= $fator*$matriz[$i][$l];
+						 }
+						 $l--;
+						 $raizes[$k] -= $fator*$matriz[$i][$l];
+					}	 
+				}
 
-		for ($i = 0; $i < $num_T; $i++) {
+				for ($i = 0; $i < $num_T; $i++) {
 					echo "( ";
 					for ($j = 0; $j < $num_T; $j++) {
 						 echo $matriz[$i][$j];
@@ -636,17 +637,29 @@ for ($i = 0; $i < $num_T; $i++) {
 					echo " )"; ?>
 				 	<br><?php
 				 }
-
 			 	 break;
-		case 17:
-		$valores = [];
-for ($i = 0; $i < $num_T; $i++) {
-$j = $i;
-$valores[$i] = $raizes[$i]/$matriz[$i][$j];
-echo $letras[$i]." = ".$valores[$i];
-?><br><?php
-}
-		 if ($count == 0) {
+		case 17: $valores = [];
+				 for ($i = 0; $i < $num_T; $i++) {
+					$j = $i;
+					$valores[$i] = $raizes[$i]/$matriz[$i][$j];
+					echo $letras[$i]." = ".$valores[$i];
+					?><br><?php
+				 }
+				 break;
+		 case 18: echo "v"?><sub><?php echo ($count+1) ?></sub>
+				 <?php echo "= (";
+				 for ($i = 0; $i < $num_T; $i++) {
+				 	 echo $letras[$i];
+				 	 echo $i == $num_T-1? ")" : ",";
+				 } ?>
+				 <br><?php
+				echo "v"?><sub><?php echo ($count+1) ?></sub>
+				 <?php echo "= (";
+				 for ($i = 0; $i < $num_T; $i++) {
+				 	 echo $valores[$i];
+				 	 echo $i == $num_T-1? ")" : ",";
+				 }		 
+				  if ($count == 0) {
 				 	 $count++;
 					 $step = 12;
 					 $pass = 12;
@@ -654,8 +667,9 @@ echo $letras[$i]." = ".$valores[$i];
 				 break;
 	}
 	$pass++;
-    } ?>
-
+    }
+    
+} ?>
 
 <br><br>
 <?php
