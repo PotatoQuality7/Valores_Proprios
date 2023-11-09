@@ -25,7 +25,7 @@ switch ($_SESSION['passo']) {
 	case 3: //Inserir valores da matriz
 			if (isset($_POST['inserido']) && !isset($_POST['valor']))
 				break;
-			if ($_POST['valor'] == null)
+			if (!isset($_POST['valor']) || $_POST['valor'] == null)
 				/*$msg = "Insira um valor"*/;
 			 else {	
 				switch ($_SESSION['letra']) {
@@ -260,7 +260,7 @@ switch ($_SESSION['passo']) {
 		$letras = ["a","b","c","d","e","f","g","h","i"];
 		//Explicacao dos passos
 		$passo = [
-			"Substituimos as cenas",
+			"Substituimos os valores",
 			"Multiplicamos o lambda pela matriz identidade",
 			"Calculamos a diferenca entre as duas matrizes",
 			"Simplificamos a diferenca",
@@ -275,8 +275,8 @@ switch ($_SESSION['passo']) {
 			"Primeiro verificamos para a primeira raiz",
 			"Depois verificamos para a segunda raiz",
 			"Multiplicamos as matrizes",
-			"Formamos uma matriz, e em seguida, aplicamos o Metodo Gauss, para obter as incognitas",
-			"No fim, temos:",
+			"Formamos um sistema de equacoes, para obter as incognitas",
+			"Apos resolvermos o sistema, temos:",
 			"E as incognitas:",
 			"Por fim, a nossa solucao:",
 		];
@@ -285,7 +285,7 @@ switch ($_SESSION['passo']) {
 		for ($step = 0; $step <= 9; $step++) {
 			$pos = 0; ?>
 			<br>
-			<p><?php echo $passo[$pass].":".$pass ?></p>
+			<p><?php echo $passo[$pass] ?></p>
 			<?php	
 		 	for ($count = 0; $count <= 1; $count++) { ?> 
 				<table style="display: inline-block">
@@ -393,7 +393,7 @@ switch ($_SESSION['passo']) {
 													$plus = true;
 													$vero1 = intval($numbros[$count][0][$i]);
 													$vero2 = intval($numbros[$count][$k][$j]);			
-													if ($vero1 != 0 && $vero2 != 0) {
+													if (($vero1 != 0 && $vero2 != 0) || ($numbros[$count][0][$i] == "0"|| $numbros[$count][$k][$i] == "0")) {
 														$cont = (intval($numbros[$count][0][$i])*intval($numbros[$count][$k][$j]));
 														array_push($status,"num");
 														array_push($coef,intval($sign.$cont));
@@ -406,26 +406,26 @@ switch ($_SESSION['passo']) {
 														}
 														else {
 															if ($vero1 == 0) {
-																$cont = "-".$numbros[$count][$k][$j]."L";
+																$cont = (-1*intval($numbros[$count][$k][$j]))."L";
 																array_push($coef,intval("-".$numbros[$count][$k][$j]));
 															}
 															else
 															if ($vero2 == 0) {
-																$cont = $numbros[$count][0][$i]."L";
-																array_push($coef,intval($sign.$numbros[$count][0][$i]));
+																$cont = (-1*intval($numbros[$count][0][$i]))."L";
+																array_push($coef,intval("-".$numbros[$count][0][$i]));
 															}
 															array_push($status,"sgl");
 														}
-													}
-													echo $cont." ";
-													$result[$count][$j] = $cont;
 												}
+												echo $cont." ";
+												$result[$count][$j] = $cont;
+											}
 										}
 										break;
 								case 8:	$sign = false;
 										for ($k = 0; $k < $num_T; $k++) {
 											for ($l = 0; $l < $num_T; $l++) {
-												if ($result[$k][$l] != "") {
+												if ($result[$k][$l] != " ") {
 													if ($sign == true)
 														echo $k == 0? "+": "-";
 													echo $result[$k][$l];
@@ -439,13 +439,17 @@ switch ($_SESSION['passo']) {
 										break;
 								case 9:	$somas = [0,0,0,0];
 										$statuses = ["cub","sqr","sgl","num"];
-										$coeff = [];
+										$coeff = [0,0,0,0];
+										$sign = false;
+										$inserido = 0;
 										for ($i = 0; $i <= 3; $i++) {
 											for ($j = 0; $j < sizeof($coef); $j++) {
 												if ($status[$j] == $statuses[$i])
 													$somas[$i] += $coef[$j];
 											}
 											if ($somas[$i] != 0) {
+												if ($somas[$i] > 0 && $sign == true)
+													echo "+";
 												echo $somas[$i];
 												switch ($statuses[$i]) {
 													case "cub": echo "L"?><sup>3</sup>
@@ -455,8 +459,11 @@ switch ($_SESSION['passo']) {
 													case "sgl": echo "L";
 																break;
 												}
-												array_push($coeff,$somas[$i]);
-											}
+												$sign = true;
+												//array_push($coeff,$somas[$i]);
+										$coeff[$inserido++] = $somas[$i];
+
+								}
 										}
 										$count = 1;
 										$i = $num_T;
@@ -464,11 +471,15 @@ switch ($_SESSION['passo']) {
 										break;			
 							}
 						}
-						echo ")";
+						if ($step == 4 && $num_T == 3) {
+						   echo "| ".$letras[$pos-3]." ".$letras[$pos-2]." ";
+						}
+							echo ")";
 ?>
 					</td>
 					</tr>
-				<?php } ?>
+				<?php } 
+				?>
 				</table>
 				<?php 
 				if ($step == 0)
@@ -489,6 +500,11 @@ switch ($_SESSION['passo']) {
 
 				//BUT I GOT TO DO WHAT I GOT TO DO
 				}
+				if ($step == 4 && $num_T == 3) {?>
+					<br><br><?php
+					echo "Como a matriz é da terceira ordem, expandimos as primeiras duas colunas para efectuarmos as multiplicações";
+					?><br><?php
+				}				
 			}
 		$pass++;
 		}
@@ -500,15 +516,24 @@ $raiz = [];
 $raizes = [];
 $valores = [];
 $count = 0;
+$broke = false;
 for ($step = 10; $step <= 18; $step++) { ?>
-	<p><?php echo $passo[$pass] ?></p> <?php
-	
+	<p><?php echo $passo[$pass].":".$pass ?></p> <?php
+	if ($broke == true)
+		break;
 	switch ($step) {
 		case 10: ?>L<sub>1</sub><?php echo "= (-".$coeff[1]."+sqrt( (".$coeff[1].")"?><sup>2</sup><?php echo "-4•".$coeff[0]."•".$coeff[2]." ) )/2•".$coeff[0];
 				 ?><br>
 				 L<sub>2</sub><?php echo "= (-".$coeff[1]."-sqrt( (".$coeff[1].")"?><sup>2</sup><?php echo "-4•".$coeff[0]."•".$coeff[2]." ) )/2•".$coeff[0];
 				 ?><br>
-				 <?php $raiz[0] = (-$coeff[1] +sqrt( pow($coeff[1],2)-(4*$coeff[0]*$coeff[2]) ) )/(2*$coeff[0]);			 
+				 <?php 
+if ($coeff[0] == 0) {
+	echo "Divisao por 0 ilegal";
+	$broke = true;
+	break;
+}
+else
+  $raiz[0] = (-$coeff[1] +sqrt( pow($coeff[1],2)-(4*$coeff[0]*$coeff[2]) ) )/(2*$coeff[0]);			 
 				 $raiz[1] = (-$coeff[1] -sqrt( pow($coeff[1],2)-(4*$coeff[0]*$coeff[2]) ) )/(2*$coeff[0]);
 				 break;
 		case 11: echo "L"?><sub>1</sub><?php echo " = ".$raiz[0];?><br><?php
@@ -545,14 +570,16 @@ for ($step = 10; $step <= 18; $step++) { ?>
 				 break;
 		case 14: ;
 		case 15: for ($i = 0; $i < $num_T; $i++) {
-					echo "( ";
+					if ($step == 14)
+						echo "( ";
 					for ($j = 0; $j < $num_T; $j++) {
 						 $algo = "a".$i.$j;
-						 echo $_POST[$algo];
-	 					 if ($step == 14)
-						 	 echo $letras[$j];
-						 if ($j != $num_T-1)
+						 echo $_POST[$algo].$letras[$j];
+						 if ($j != $num_T-1) {
+							if ($step == 15)
+								echo " +";
 						 	echo " ";
+						 }
 					}
 					if ($step == 14) {
 						echo " )"; 
@@ -564,11 +591,10 @@ for ($step = 10; $step <= 18; $step++) { ?>
 						echo "( ";
 					 }
 					 else
-					   echo " | ";
-					echo $raiz[$count];
+					   echo " = ";
+					echo $raiz[$count].$letras[$i];
 					if ($step == 14)
-						echo $letras[$i];
-					echo " )"; ?>
+						echo " )"; ?>
 				 	<br><?php
 				 }
 				 break;
@@ -577,76 +603,39 @@ for ($step = 10; $step <= 18; $step++) { ?>
 						for ($j = 0; $j < $num_T; $j++) {
 							$algo = "a".$i.$j;
 							$matriz[$i][$j] = $_POST[$algo];
-						}
+						} 
 					}
-				 for ($i = 0; $i < $num_T; $i++) {
-						$j = $i;
-						if ($matriz[$i][$j] != 0)
-							break;
-						 else {
-							for ($k = $i; $k < $num_T; $k++) {
-								if ($matriz[$k][$j] != 0) {
-									 for ($l = 0; $l < $num_T; $l++) {
-										$temp = $matriz[$i][$l];
-										$matriz[$i][$l] = $matriz[$k][$l];
-										$matriz[$k][$l] = $temp;
-									 }
-								    break;
-								}
-							}
-				 		}
-				 }
+				$x; $y; $z;
+				//look for zeroes
 				for ($i = 0; $i < $num_T; $i++) {
-					 $j = $i;
-					for ($k = 0; $k < $num_T; $k++) {
-						 if ($i == $k || $matriz[$k][$j] == 0)
-						 	continue;
-						 for ($l = 0; $l < $num_T; $l++) {
-						 	if ($matriz[$i][$l] == 0)
-						 		continue;
-							$fator = $matriz[$k][$l]/$matriz[$i][$l];
-							$matriz[$k][$l] -= $fator*$matriz[$i][$l];
-						 }
-						 $l--;
-						 $raizes[$k] -= $fator*$matriz[$i][$l];
-					}	 
+					$matriz[$i][$i] -= $raiz[$count];
 				}
-
+if ($matriz[0][0] == 0)
+	$x = 0;
+ else
+				$x = (-$matriz[0][1])/$matriz[0][0];
+if ($matriz[1][1] == 0)
+	$y = 0;
+ else
+				$y = -(($x*$matriz[1][0])/$matriz[1][1]);
+if ($matriz[0][0] == 0)
+	$x = 0;
+ else
+				$x = -$matriz[0][1]/$matriz[0][0];
+				$valores[$count][0] = $x;
+				$valores[$count][1] = $y;
 				for ($i = 0; $i < $num_T; $i++) {
-					echo "( ";
-					for ($j = 0; $j < $num_T; $j++) {
-						 echo $matriz[$i][$j];
-	 					 if ($step == 14)
-						 	 echo $letras[$j];
-						 if ($j != $num_T-1)
-						 	echo " ";
-					}
-					if ($step == 14) {
-						echo " )"; 
-						if (($i == round(($num_T+1)/2,0,PHP_ROUND_HALF_DOWN)-1))
-							echo " = ";
-						 else {
-						   ?>&nbsp&nbsp&nbsp&nbsp<?php
-						 }
-						echo "( ";
-					 }
-					 else
-					   echo " | ";
-					echo $raizes[$i];
-					if ($step == 14)
-						echo $letras[$i];
-					echo " )"; ?>
-				 	<br><?php
-				 }
-			 	 break;
-		case 17: for ($i = 0; $i < $num_T; $i++) {
 					$j = $i;
-					if ($matriz[$i][$j] == 0)
+					if ($matriz[$i][$j] == 0) {
+						$valores[$count][$i] = 0;
 						continue;
-					$valores[$count][$i] = $raizes[$i]/$matriz[$i][$j];
+					}
+					//$valores[$count][$i] = $raizes[$i]/$matriz[$i][$j];
 					echo $letras[$i]." = ".$valores[$count][$i];
 					?><br><?php
 				 }
+				 $step = 17;
+				 $pass = 17;
 				 if ($count == 0) {
 				 	 $count++;
 					 $step = 12;
@@ -673,15 +662,13 @@ for ($count = 0; $count <= 1; $count++) {
 				 	 echo "ou";?>
 				 <br><?php 
 }
-?>
-			 	 <br> <?php
 			 	 echo "Onde o w é o nosso autovalor, e o (";
 			 	 for ($i = 0; $i < $num_T; $i++) {
 				 	 echo $letras[$i];
 				 	 echo $i == $num_T-1? ")" : ",";
 				 } ?>
 				 <br><?php
-				 echo "é o nosso autovetor.";
+				 echo "o nosso autovetor.";
 				 break;
 	}
 	$pass++;
