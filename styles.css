@@ -8,4 +8,16 @@ label {
 
 table {
 	text-align: justify;
+	font-size: 30px;
+}
+
+#original {
+	margin: auto;
+}
+
+body {
+	background-color: #282c34;
+	color: white;
+	text-align: center;
+	font-size: 40px;
 }

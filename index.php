@@ -73,7 +73,7 @@ if ($_SESSION['passo'] >= 3) {
 	$letras = ["x", "y", "z"];
 	$algo = ""; ?>
 	<form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST">
-		<table>
+		<table id="original">
 			<legend>Matriz</legend>
 			<?php
 				$num_T = $_SESSION['num_T'];
@@ -284,7 +284,7 @@ switch ($_SESSION['passo']) {
 		$pass = 0;
 		for ($step = 0; $step <= 9; $step++) {
 			$pos = 0; ?>
-			<br>
+			<br><br><br><br><br>
 			<p><?php echo $passo[$pass] ?></p>
 			<?php	
 		 	for ($count = 0; $count <= 1; $count++) { ?> 
@@ -518,7 +518,9 @@ $valores = [];
 $count = 0;
 $broke = false;
 for ($step = 10; $step <= 18; $step++) { ?>
-	<p><?php echo $passo[$pass].":".$pass ?></p> <?php
+			<br><br><br><br><br>
+
+	<p><?php echo $passo[$pass] ?></p> <?php
 	if ($broke == true)
 		break;
 	switch ($step) {
